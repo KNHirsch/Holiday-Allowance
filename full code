@@ -1,0 +1,217 @@
+################################################
+MAIN userform code, the form contains within it;
+Contract Type (hours)
+Annual Employment period
+Type of Leave (Weeks) 
+Holiday Taken (if applicable)
+'Cancel' & 'Add to Sheet' buttons
+Calculate Leave Entitlement buttons 
+################################################
+
+''' Option Explicit
+
+Private Sub DaysWorkedtxt_Change()
+
+End Sub
+
+Private Sub Label4_Click()
+
+End Sub
+
+Private Sub UserForm_Initialize()
+    ' Add items to combo boxes
+    ComboBox1.AddItem "Full-Time"
+    ComboBox1.AddItem "Part-Time Fixed"
+    ComboBox1.AddItem "Shift-Worker"
+
+    ComboBox2.AddItem "Full year" ' Jan 1st to Dec 31st
+    ComboBox2.AddItem "Starting part-way" ' Start date: user input, end date: Dec 31st
+    ComboBox2.AddItem "Leaving part-way"  ' Start & end date: user input
+    ComboBox2.AddItem "Starting & leaving part-way"  ' Start & end date: user input
+
+    ComboBox3.AddItem "Paid"
+    ComboBox3.AddItem "Unpaid"
+
+    ' Disable hours/days WORKED labels & textboxes from showing by default
+    DaysLabel.Visible = False
+    DaysLabel.Enabled = False
+    DaysWorkedtxt.Visible = False
+    DaysWorkedtxt.Enabled = False
+    HoursLabel.Visible = False
+    HoursLabel.Enabled = False
+    HoursWorkedtxt.Visible = False
+    HoursWorkedtxt.Enabled = False
+
+    ' Disable days/week HOLIDAY labels & textboxes from showing by default
+    DaysHolLabel.Visible = False
+    DaysHolLabel.Enabled = False
+    DaysHoltxt.Visible = False
+    DaysHoltxt.Enabled = False
+    WeeksHolLabel.Visible = False
+    WeeksHolLabel.Enabled = False
+    WeeksHoltxt.Visible = False
+    WeeksHoltxt.Enabled = False
+End Sub
+
+' Open relevant userforms to enter days or hours worked per week when contract type is selected
+Public Sub combobox1_change()
+    Select Case ComboBox1.Value
+        Case "Part-Time Fixed"
+            DaysPerWeek.Show
+        Case "Shift-Worker"
+            HoursPerWeek.Show
+    End Select
+End Sub
+
+' When category is selected, open a second userform to allow the user to input specific date information
+' https://www.mrexcel.com/board/threads/open-user-form-based-on-combobox-selection.614982/
+Private Sub ComboBox2_Change()
+    Select Case ComboBox2.Value
+        Case "Starting part-way"
+            StartEndDAte.Show
+        Case "Leaving part-way"
+            StartEndDAte.Show
+        Case "Starting & leaving part-way"
+            StartEndDAte.Show
+    End Select
+End Sub
+
+Private Sub ComboBox3_Change()
+    LengthofLeave.Show
+End Sub
+
+Private Sub CommandButton2_Click()
+    Unload UserFormMain
+    End
+End Sub
+
+' Error message / functionality for TextBox1
+' If input is non-numeric, then display an error and allow correction in TextBox1
+' CANCEL = TRUE
+Private Sub TextBox1_Exit(ByVal cancel As MSForms.ReturnBoolean)
+    With TextBox1
+        If Not IsNumeric(TextBox1.Value) And TextBox1.Value <> "" Then
+            MsgBox "ID must be numeric", vbCritical, "Error"
+            cancel = True
+        End If
+    End With
+End Sub
+
+' Transfer information to table
+Private Sub CommandButton1_Click()
+    ' Your code for transferring information to a table goes here
+End Sub
+
+' TextBox1 = VbNullString
+' Are you sure you want to exit?
+Private Sub UserForm_QueryClose(cancel As Integer, CloseMode As Integer)
+    If CloseMode = 0 Then
+        If MsgBox("Are you sure you want to exit?", vbQuestion + vbYesNo) = vbNo Then
+            cancel = True
+        Else
+            End
+        End If
+    End If
+End Sub
+
+Private Sub combobox1_afterupdate()
+    ' Disabling & enabling Hours / Days WORKED textboxes to only display when the relevant option is selected
+    ' If 'part-time fixed' is selected, then display Days label & textbox
+    If ComboBox1 = "Part-Time Fixed" Then
+        DaysLabel.Visible = True
+        DaysLabel.Enabled = True
+        DaysWorkedtxt.Visible = True
+        DaysWorkedtxt.Enabled = True
+        HoursLabel.Visible = False
+        HoursLabel.Enabled = False
+        HoursWorkedtxt.Visible = False
+        HoursWorkedtxt.Enabled = False
+    ' If 'Shift-Worker' is selected, then display Hours label & textbox
+    ElseIf ComboBox1 = "Shift-Worker" Then
+        DaysLabel.Visible = False
+        DaysLabel.Enabled = False
+        DaysWorkedtxt.Visible = False
+        DaysWorkedtxt.Enabled = False
+        HoursLabel.Visible = True
+        HoursLabel.Enabled = True
+        HoursWorkedtxt.Visible = True
+        HoursWorkedtxt.Enabled = True
+    Else
+        ' If none of the above are selected, don't display either Label or textbox
+        DaysLabel.Visible = False
+        DaysLabel.Enabled = False
+        DaysWorkedtxt.Visible = False
+        DaysWorkedtxt.Enabled = False
+        HoursLabel.Visible = False
+        HoursLabel.Enabled = False
+        HoursWorkedtxt.Visible = False
+        HoursWorkedtxt.Enabled = False
+    End If
+End Sub
+
+Private Sub ComboBox3_afterupdate()
+    If LengthofLeave.OptionButton1.Value = True Then
+        DaysHolLabel.Visible = True
+        DaysHolLabel.Enabled = True
+        DaysHoltxt.Visible = True
+        DaysHoltxt.Enabled = True
+        WeeksHolLabel.Visible = False
+        WeeksHolLabel.Enabled = False
+        WeeksHoltxt.Visible = False
+        WeeksHoltxt.Enabled = False
+    ElseIf LengthofLeave.OptionButton2.Value = True Then
+        DaysHolLabel.Visible = False
+        DaysHolLabel.Enabled = False
+        DaysHoltxt.Visible = False
+        DaysHoltxt.Enabled = False
+        WeeksHolLabel.Visible = True
+        WeeksHolLabel.Enabled = True
+        WeeksHoltxt.Visible = True
+        WeeksHoltxt.Enabled = True
+    End If
+End Sub
+
+' Maths to calculate Holiday Entitlement
+' All allowance standards fetched from below link
+' (Department for Business, Energy & Industrial Strategy, 2020) https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/844795/BEIS_Holiday_Entitlement_Calculation_Guidance.pdf
+Private Sub CommandButton3_Click()
+    ' Your code for calculating holiday entitlement goes here
+End Sub
+
+################################################
+START/END date userform within main userform with full calendar integration (see later code)
+################################################
+
+Option Explicit
+
+Private Sub CalSD_Click()
+DatePickerStartDate.Show
+End Sub
+
+
+Private Sub CalED_Click()
+DatePickerEndDate.Show
+End Sub
+
+Private Sub CommandButton1_Click()
+
+'assigning date values to public variables
+StartDate = CDate(Me.TextBox1.Value)
+EndDate = CDate(Me.TextBox2.Value)
+
+Me.Hide
+End Sub
+
+Private Sub Label3_Click()
+End Sub
+
+Private Sub TextBox1_Change()
+End Sub
+
+Private Sub TextBox2_Change()
+End Sub
+
+Private Sub UserForm_Click()
+End sub
+
+
