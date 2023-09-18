@@ -178,9 +178,15 @@ Private Sub CommandButton3_Click()
     ' Your code for calculating holiday entitlement goes here
 End Sub
 
-################################################
+
+#####################################################################
+SECONDARY USERFORMS (WITHIN THE MAIN FORM TO GATHER FURTHER DETAILS)
+#####################################################################
+
+
+###########################################################################################
 START/END date userform within main userform with full calendar integration (see later code)
-################################################
+###########################################################################################
 
 Option Explicit
 
@@ -213,5 +219,107 @@ End Sub
 
 Private Sub UserForm_Click()
 End sub
+
+###########################################################################################
+length of leave userform; days or weeks option. 
+###########################################################################################
+Option Explicit
+
+Private Sub CommandButton1Days_Click()
+  'error messages for incorrect entry values
+    If OptionButton1.Value = True And TextBox1.Value > 28 And TextBox1.Value <> "" Then
+    MsgBox "The maximum paid leave for a full-time worker is 28 days", vbCritical, "Error"
+    
+    'maximum full-time paid leave in weeks = 28/5(working days per week) = 5.6
+    ElseIf OptionButton2.Value = True And TextBox1.Value > 5.6 And TextBox1.Value <> "" Then
+    MsgBox "The maximum paid leave for a full-time worker is 5.6 weeks", vbCritical, "Error"
+    
+    'error messages for 0 or blank entries
+    ElseIf TextBox1.Value = "" Or TextBox1.Value = 0 Then
+    MsgBox "Please enter a value in the textbox", vbCritical, "Error"
+    Else
+    Me.Hide
+    End If
+    
+'put the selected option value (weeks or days) in the corresponding textbox in userformmain
+If OptionButton1.Value = True Then
+UserFormMain.DaysHoltxt.Text = LengthofLeave.TextBox1.Value
+ElseIf OptionButton2.Value = True Then
+UserFormMain.WeeksHoltxt.Text = LengthofLeave.TextBox1.Value
+End If
+
+End Sub
+
+
+'Private Sub TextBox1_Change()
+
+Private Sub TextBox1_Exit(ByVal cancel As MSForms.ReturnBoolean)
+
+    With TextBox1
+    If Not IsNumeric(TextBox1.Value) And TextBox1.Value <> "" Then
+    MsgBox "Value must be numeric", vbCritical, "Error"
+    cancel = True
+    End If
+    End With
+    
+End Sub
+
+Private Sub UserForm_Click()
+
+End Sub
+
+###########################################################################################
+hours worked per week 
+###########################################################################################
+Option Explicit
+
+Private Sub CommandButton1_Click()
+'error messages for non-numeric values & values exceeding fixed part-time hours (35)
+With TextBox1
+If Not IsNumeric(TextBox1.Value) And TextBox1.Value <> "" Then
+       MsgBox "Value must be numeric", vbCritical, "Error"
+       ElseIf TextBox1.Value > 35 And TextBox1.Value <> "" Then
+       MsgBox "Maximum part-time hours cannot exceed 35", vbCritical, "Error"
+       'Cancel = True
+       End If
+       
+End With
+
+UserFormMain.HoursWorkedtxt.Text = HoursPerWeek.TextBox1.Value
+Me.Hide
+
+
+End Sub
+
+###########################################################################################
+days worked per week 
+###########################################################################################
+
+Option Explicit
+
+Private Sub UserForm_Initialize()
+    With DaysPerWeek.Combobox1Days
+    .AddItem "1"
+    .AddItem "2"
+    .AddItem "3"
+    .AddItem "4"
+    .AddItem "5"
+    .AddItem "6"
+    .AddItem "7"
+    End With
+End Sub
+
+Private Sub CommandButton1_Click()
+UserFormMain.DaysWorkedtxt.Text = DaysPerWeek.Combobox1Days.Value
+Me.Hide
+End Sub
+
+##############################################################
+USED A CALENDAR FROM Team authors:                                               
+'Krisztina Szabó                                             #
+'Gábor Madács                                                #
+'Roberto Mensa (nick r)                                      #
+'https://sites.google.com/site/e90e50/calendar-control-class 
+###############################################################
 
 
