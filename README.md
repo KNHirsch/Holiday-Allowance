@@ -1,4 +1,4 @@
-# Holiday-Allowance
+# VBA-Holiday-Allowance calculator
 ### VBA - Holiday Allowance calculator and userform with full Excel template & Macros, error-handling inclusive. 
 
 ##### The goal of this project was to develop an integrated user-form within excel which functions to allow staff leave calculations to be made based on UK the holiday allowances.
